@@ -12,7 +12,10 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": true,
+      "http": {
+        "scope": ["https://graphql.anilist.co"]
+      }
     },
     "bundle": {
       "active": true,
