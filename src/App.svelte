@@ -74,4 +74,32 @@
 	{
 		background-color: rgb(24, 24, 24);
 	}
+
+	:global(::-webkit-scrollbar)
+	{
+		width: 4px;
+	}
+
+	:global(::-webkit-scrollbar-track)
+	{
+		background: transparent;
+	}
+
+	:global(::-webkit-scrollbar-thumb)
+	{
+		background: rgb(136, 136, 136);
+		border-radius: 10px;
+	}
+
+	:global(::-webkit-scrollbar-thumb:hover)
+	{
+		background: rgb(100, 100, 100);
+		border-radius: 10px;
+	}
+
+	:global(::-webkit-scrollbar-thumb:active)
+	{
+		background: rgb(100, 100, 100);
+		border-radius: 10px;
+	}
 </style>
