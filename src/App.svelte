@@ -1,46 +1,66 @@
 <script lang="ts">
-	import UserMockup from './components/UserMockup.svelte';
+	import CardGrid from "./components/CardGrid.svelte";
 
-	import { searchForUser } from './modules/anilist';
-	import type { User } from './modules/anilistInterface';
+	import type { Media } from "./modules/anilistInterface";
+	import { searchQuery } from "./modules/anilist";
 
-	let username: string;
-
-	let request = undefined;
-	let userInfo: User = null;
-
-	function getData()
+	let query = `
+	query
 	{
-		request = searchForUser(username)
-			.then(
-				(result) =>
-				{
-					userInfo = result.data.User;
-				},
-				(error) => 
-				{
-					userInfo = null;
-				}
-			)
-	}
+		Page(page: 1, perPage: 50)
+		{
+			media(type: ANIME, sort: [TRENDING_DESC])
+			{
+			title 
+			{
+				romaji
+				english
+				native
+			}
+			
+			format
+			status
+			description(asHtml: true)
+			startDate {
+				year
+				month
+				day
+			}
+			endDate {
+				year
+				month
+				day
+			}
+			season
+			seasonInt
+			seasonYear
+			episodes
+			duration
+			coverImage
+			{
+				extraLarge
+				large
+				medium
+				color
+			}
+			bannerImage
+			genres
+			synonyms
+			}
+		}
+	}`;
+
+	let animes = searchQuery(query);
 </script>
 
 <main>
-	<div class="split left">
-		<p>Type the name of an user:</p>
-		<input type="text" bind:value={username}/>
-		<br>
-		<button on:click={getData}>Search</button>
-	</div>
-	
-	<div class="split right">
-		{#if userInfo}
-			<p>Result:</p>
-			<UserMockup username={userInfo.name} userId={userInfo.id} userAvatar={userInfo.avatar.large}/>	
-		{:else if request}
-			<p>Fetching data...</p>
-		{/if}
-	</div>
+	{#await animes then result}
+		{#if result.data.Page.media}
+			<CardGrid animes={result.data.Page.media}/>
+		{:else}
+			<p>Error!</p>
+		{/if}	
+	{/await}
 </main>
 
 <style>
@@ -50,21 +70,8 @@
 		Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	}
 
-	.split {
-		height: 100%;
-		width: 50%;
-		position: fixed;
-		top: 0;
-		padding: 20px;
-	}
-
-	.left {
-		left: 0;
-		background-color: rgb(200, 200, 200);
-	}
-
-	.right {
-		right: 0;
-		background-color: rgb(180, 180, 180);
+	:global(body)
+	{
+		background-color: rgb(24, 24, 24);
 	}
 </style>

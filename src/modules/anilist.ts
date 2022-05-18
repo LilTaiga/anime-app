@@ -49,3 +49,12 @@ export async function searchForUser(name: string): Promise<AnilistData>
     else
         return Promise.reject("Error while fetching the user: " + result.status);
 }
+
+export async function searchQuery(query: string): Promise<AnilistData>
+{
+    let result = await sendRequest(query, {});
+    if (result.ok)
+        return result.data;
+    else
+        return Promise.reject("Error while fetching the user: " + result.status);
+}
