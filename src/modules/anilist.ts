@@ -1,9 +1,9 @@
 import { Body, fetch, FetchOptions, Response } from "@tauri-apps/api/http";
-import type { AnilistData } from "./anilistInterface";
+import type { AnilistData, MediaQuery } from "./anilistInterface";
 
 const url: string = "https://graphql.anilist.co";
 
-async function sendRequest(query: string, variables: Record<any, any>): Promise<Response<AnilistData>>
+async function sendRequest(query: string, variables: Record<string, any>): Promise<Response<AnilistData>>
 {
     let options: FetchOptions = {
         method: "POST",
@@ -13,7 +13,7 @@ async function sendRequest(query: string, variables: Record<any, any>): Promise<
         },
         body: Body.json({
             query: query,
-            variables: variables,
+            variables: JSON.stringify(variables, parseVariables),
         })
     };
 
@@ -50,11 +50,21 @@ export async function searchForUser(name: string): Promise<AnilistData>
         return Promise.reject("Error while fetching the user: " + result.status);
 }
 
-export async function searchQuery(query: string): Promise<AnilistData>
+export async function searchQuery(query: string, variables?: MediaQuery): Promise<AnilistData>
 {
-    let result = await sendRequest(query, {});
+    if(variables == null || variables == undefined)
+        variables = {};
+    
+    let result = await sendRequest(query, variables);
     if (result.ok)
         return result.data;
     else
         return Promise.reject("Error while fetching the user: " + result.status);
+}
+
+function parseVariables(key: string, value: any)
+{
+    if(value == false)
+        return undefined;
+    return value;
 }

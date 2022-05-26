@@ -1,21 +1,21 @@
-<script>
-    export let titles = {
-        native: "Lorem Ipsilum",
-    };
+<script lang="ts">
+    import type { Media } from "src/modules/anilistInterface"
 
-    export let cover = {
-        large: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140960-Yl5M3AiLZAMq.png",
-        medium: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx140960-Yl5M3AiLZAMq.png",
-        color: "#c9f1f1",
+    export let media: Media;
+
+    function onClick()
+    {
+        alert(`You clicked ${media.title.romaji}`)
     }
 </script>
 
-<div class="anime-card">
+<div class="anime-card" on:click={onClick}
+     style="--color:{media.coverImage.color}">
     <img class="anime-cover"
-         src={cover.extraLarge ? cover.extraLarge : cover.large}
+         src={media.coverImage.extraLarge ? media.coverImage.extraLarge : media.coverImage.large}
          alt="Anime Cover"/> <br>
     
-    <p class="anime-title">{titles.romaji ? titles.romaji : titles.native}</p>
+    <p class="anime-title">{media.title.romaji ? media.title.romaji : media.title.native}</p>
 </div>
 
 <style>
@@ -27,6 +27,11 @@
         width: 180px;
 
         padding: 8px;
+    }
+
+    .anime-card:hover > .anime-title
+    {
+        color: var(--color);
     }
 
     .anime-cover
@@ -51,6 +56,7 @@
         margin: 0px;
         margin-left: 4px;
         color: aliceblue;
+        transition: color .125s;
     }
 
 </style>

@@ -20,8 +20,6 @@ export interface User
     updatedAt: number,
 }
 
-
-
 export interface Avatar
 {
     medium: string,
@@ -47,6 +45,16 @@ export interface Page
     media: Media[],
 }
 
+export interface MediaQuery
+{
+    title?: string,
+    genres?: Genres[],
+    season?: MediaSeason,
+    year?: number,
+    format?: MediaFormat[],
+    status?: MediaStatus[],
+}
+
 export interface Media
 {
     title: MediaTitle,
@@ -61,7 +69,7 @@ export interface Media
     duration?: number,
     coverImage: MediaCoverImage,
     bannerImage?: string,
-    genres: string[],
+    genres: Genres[],
     synonyms: string[],
 }
 
@@ -117,3 +125,23 @@ export interface MediaCoverImage
     medium: string,
     color: string,
 }
+
+export type Genres = 
+    "Action" |
+    "Adventure" |
+    "Comedy" |
+    "Drama" |
+    "Ecchi" |
+    "Fantasy" |
+    "Horror" |
+    "Mahou Shoujo" |
+    "Mecha" |
+    "Music" |
+    "Mystery" |
+    "Psychological" |
+    "Romance" |
+    "Sci-fi" |
+    "Slice of Life" |
+    "Sports" |
+    "Supernatural" |
+    "Thriller";

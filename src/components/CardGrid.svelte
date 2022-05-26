@@ -8,8 +8,7 @@
 
 <div class="grid-container">
     {#each animes as anime}
-        <Card titles={anime.title}
-              cover={anime.coverImage}/>
+        <Card media={anime} />
     {/each}
 </div>
 
@@ -17,7 +16,7 @@
     .grid-container
     {
         display: grid;
-        grid-template-columns: auto auto auto auto auto;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         justify-content: space-evenly;
         width: 100%;
         gap: 4px;
