@@ -49,6 +49,7 @@
             }
         }
     }`;
+    
 
     let variables: MediaQuery = {};
 	let animes: Promise<AnilistData> = null;
