@@ -50,8 +50,53 @@ export async function searchForUser(name: string): Promise<AnilistData>
         return Promise.reject("Error while fetching the user: " + result.status);
 }
 
-export async function searchQuery(query: string, variables?: MediaQuery): Promise<AnilistData>
+export async function searchMedia(variables?: MediaQuery): Promise<AnilistData>
 {
+    let query = `
+	query($title: String, $genres: [String], $season: MediaSeason, $year: FuzzyDateInt, $format: [MediaFormat], $status: [MediaStatus])
+    {
+        Page(page: 1, perPage: 50)
+        {
+            media(search: $title, genre_in: $genres, startDate_greater: $year, format_in: $format, status_in: $status, season: $season, sort: [POPULARITY_DESC], isAdult: false, type: ANIME)
+            {
+            title 
+            {
+                romaji
+                english
+                native
+            }
+            
+            format
+            status
+            description(asHtml: true)
+            startDate {
+                year
+                month
+                day
+            }
+            endDate {
+                year
+                month
+                day
+            }
+            season
+            seasonInt
+            seasonYear
+            episodes
+            duration
+            coverImage
+            {
+                large
+                medium
+                color
+            }
+            bannerImage
+            genres
+            synonyms
+            }
+        }
+    }`;
+
     if(variables == null || variables == undefined)
         variables = {};
     

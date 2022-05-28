@@ -2,78 +2,40 @@
     import CardGrid from "../CardGrid.svelte";
     import SearchBar from "../SearchBar.svelte";
 
-    import { searchQuery } from "../../modules/anilist";
+
+    import { searchMedia } from "../../modules/anilist";
     import type { AnilistData, MediaQuery } from "src/modules/anilistInterface";
 
-    let query = `
-	query($title: String, $genres: [String], $season: MediaSeason, $year: FuzzyDateInt, $format: [MediaFormat], $status: [MediaStatus])
-    {
-        Page(page: 1, perPage: 50)
-        {
-            media(search: $title, genre_in: $genres, startDate_greater: $year, format_in: $format, status_in: $status, season: $season, sort: [POPULARITY_DESC], isAdult: false, type: ANIME)
-            {
-            title 
-            {
-                romaji
-                english
-                native
-            }
-            
-            format
-            status
-            description(asHtml: true)
-            startDate {
-                year
-                month
-                day
-            }
-            endDate {
-                year
-                month
-                day
-            }
-            season
-            seasonInt
-            seasonYear
-            episodes
-            duration
-            coverImage
-            {
-                large
-                medium
-                color
-            }
-            bannerImage
-            genres
-            synonyms
-            }
-        }
-    }`;
-    
 
-    let variables: MediaQuery = {};
-	let animes: Promise<AnilistData> = null;
-    let animeTimeout = setTimeout(delayedSearch, 1000);
+    let searchVariables: MediaQuery = {};
+	let animeList: Promise<AnilistData> = null;
+    let searchTimeout: NodeJS.Timeout = setTimeout(delayedSearch, 500);
+
     $:
     {
-        variables = variables;
-        clearTimeout(animeTimeout);
-        animeTimeout = setTimeout(delayedSearch, 1000);
+        searchVariables = searchVariables;
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(delayedSearch, 500);
     }
 
     function delayedSearch()
     {
-        animes = searchQuery(query, variables);
+        animeList = null;
+        animeList = searchMedia(searchVariables);
     }
+    
 </script>
 
 <div>
     <div>
-        <SearchBar bind:searchText={variables.title}/>
+        <div>
+            <p>Digite o nome do coiso:</p>
+            <input bind:value={searchVariables.title}/>
+        </div>
     </div>
     <div>
-        {#if animes}
-            {#await animes}
+        {#if animeList}
+            {#await animeList}
                 <p>Waiting for data...</p>
             {:then result} 
                 {#if result.data.Page}
@@ -89,4 +51,3 @@
         {/if}
     </div>
 </div>
-
