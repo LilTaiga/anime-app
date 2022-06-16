@@ -23,6 +23,11 @@
 		color: white;
 	}
 
+	:global(label)
+	{
+		color: white;
+	}
+
 	:global(::-webkit-scrollbar)
 	{
 		width: 4px;
