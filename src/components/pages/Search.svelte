@@ -5,6 +5,9 @@
     import { searchMedia } from "../../modules/anilist";
     import type { AnilistData, MediaQuery } from "src/modules/anilistInterface";
 
+
+    // Searching stuff
+
     let searchVariables: MediaQuery = {
         title: undefined,
         genres: [undefined],
@@ -13,7 +16,6 @@
         format: [undefined],
         status: [undefined]
     };
-
 
     let genres = [
         "Action",
@@ -58,6 +60,28 @@
         { value: "NOT_YET_RELEASED", text: "Not yet released" },
         { value: "CANCELLED", text: "Cancelled" },
     ];
+
+    // Search results
+    let searchResult: Promise<AnilistData> = searchMedia(searchVariables);
+    let searchTimeout: NodeJS.Timeout | null = null;
+
+    $:
+    {
+        searchVariables = searchVariables;
+        delayedSearch();
+    }
+
+    function delayedSearch()
+    {
+        if(searchTimeout != null)
+        {
+            clearTimeout(searchTimeout);
+            searchTimeout = null;
+        }
+
+        searchTimeout = setTimeout(() => searchResult = searchMedia(searchVariables), 500);
+    }
+    
     
 </script>
 
@@ -146,6 +170,8 @@
 </style>
 
 <div>
+    <!-- #region Search -->
+
     <div class="flex-horizontal"
          name="searchParameters">
         <div class="flex-vertical search1">
@@ -210,6 +236,12 @@
         </div>
     </div>
 
+    <!-- #endregion -->
+    
+    <!-- #region Search results-->
+
+    
+    <!-- old
     <div>
         <p>Title: {searchVariables.title}</p>
         <p>Genre: {searchVariables.genres}</p>
@@ -220,4 +252,21 @@
 
         <pre style="color: white;">{JSON.stringify(searchVariables, (key, value) => value == false || value == null ? undefined : value, 2)}</pre>
     </div>
+    -->
+
+    {#if searchResult}
+        {#await searchResult}
+            <p>Searching...</p>
+        {:then data}
+            {#if data.data}
+                <CardGrid animes={data.data.Page.media}/>
+            {:else}
+                <p>An error has occurred...</p>
+            {/if}
+        {/await}
+    {:else}
+        <p>No search has been made.</p>
+    {/if}
+
+    <!-- #endregion -->
 </div>

@@ -53,11 +53,11 @@ export async function searchForUser(name: string): Promise<AnilistData>
 export async function searchMedia(variables?: MediaQuery): Promise<AnilistData>
 {
     let query = `
-	query($title: String, $genres: [String], $season: MediaSeason, $year: FuzzyDateInt, $format: [MediaFormat], $status: [MediaStatus])
+	query($title: String, $genres: [String], $season: MediaSeason, $year: Int, $format: [MediaFormat], $status: [MediaStatus])
     {
         Page(page: 1, perPage: 50)
         {
-            media(search: $title, genre_in: $genres, startDate_greater: $year, format_in: $format, status_in: $status, season: $season, sort: [POPULARITY_DESC], isAdult: false, type: ANIME)
+            media(search: $title, genre_in: $genres, seasonYear: $year, format_in: $format, status_in: $status, season: $season, sort: [POPULARITY_DESC], isAdult: false, type: ANIME)
             {
             title 
             {
@@ -109,7 +109,7 @@ export async function searchMedia(variables?: MediaQuery): Promise<AnilistData>
 
 function parseVariables(key: string, value: any)
 {
-    if(value == false)
+    if(value == false || value == null)
         return undefined;
     return value;
 }
