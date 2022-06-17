@@ -3,21 +3,19 @@
 
 
     import { searchMedia } from "../../modules/anilist";
-    import type { AnilistData, MediaQuery } from "src/modules/anilistInterface";
+    import type { AnilistData, Genres, MediaFormat, MediaSeason, MediaStatus } from "src/modules/anilistInterface";
 
 
     // Searching stuff
 
-    let searchVariables: MediaQuery = {
-        title: undefined,
-        genres: [undefined],
-        season: undefined,
-        year: undefined,
-        format: [undefined],
-        status: [undefined]
-    };
+    let title: string;
+    let genre: Genres;
+    let season: MediaSeason;
+    let year: number | null;
+    let format: MediaFormat;
+    let status: MediaStatus;
 
-    let genres = [
+    const genres = [
         "Action",
         "Adventure",
         "Comedy",
@@ -38,14 +36,14 @@
         "Thriller",
     ];
 
-    let seasons = [
+    const seasons = [
         { value: "WINTER", text: "Winter" },
         { value: "SPRING", text: "Spring" },
         { value: "SUMMER", text: "Summer" },
         { value: "FALL", text: "Fall" },
     ];
 
-    let formats = [
+    const formats = [
         { value: "TV", text: "TV" },
         { value: "TV_SHORT", text: "TV Short" },
         { value: "MOVIE", text: "Movie" },
@@ -54,7 +52,7 @@
         { value: "ONA", text: "ONA" },
     ];
 
-    let statuses = [
+    const statuses = [
         { value: "FINISHED", text: "Finished" },
         { value: "RELEASING", text: "Releasing" },
         { value: "NOT_YET_RELEASED", text: "Not yet released" },
@@ -62,14 +60,8 @@
     ];
 
     // Search results
-    let searchResult: Promise<AnilistData> = searchMedia(searchVariables);
+    let searchResult: Promise<AnilistData> = searchMedia({});
     let searchTimeout: NodeJS.Timeout | null = null;
-
-    $:
-    {
-        searchVariables = searchVariables;
-        delayedSearch();
-    }
 
     function delayedSearch()
     {
@@ -79,7 +71,14 @@
             searchTimeout = null;
         }
 
-        searchTimeout = setTimeout(() => searchResult = searchMedia(searchVariables), 500);
+        searchTimeout = setTimeout(() => searchResult = searchMedia({
+            title: title || "",
+            genres: [genre] || undefined,
+            season: season || "",
+            year: year || undefined,
+            format: [format] || undefined,
+            status: [status] || undefined,
+        }), 500);
     }
     
     
@@ -177,13 +176,13 @@
         <div class="flex-vertical search1">
             <label for="titleSearch">Title:</label>
             <input id="titleSearch" type="search"
-                   bind:value={searchVariables.title}/>
+                   bind:value={title} on:input={delayedSearch}/>
         </div>
 
         <div class="flex-vertical search2">
             <label for="genreSearch">Genre:</label>
             <select id="genreSearch"
-                    bind:value={searchVariables.genres[0]}>
+                    bind:value={genre} on:input={delayedSearch}>
                 <option value="" selected>Any</option>
 
                 {#each genres as genre}
@@ -195,7 +194,7 @@
         <div class="flex-vertical search3">
             <label for="seasonSearch">Season:</label>
             <select id="seasonSearch"
-                    bind:value={searchVariables.season}>
+                    bind:value={season} on:input={delayedSearch}>
                 <option value="" selected>Any</option>
 
                 {#each seasons as season}
@@ -208,13 +207,13 @@
             <label for="yearSearch">Year:</label>
             <input id="yearSearch"
                    type="number" min="1940" max="2100"
-                   bind:value="{searchVariables.year}"/>
+                   bind:value="{year}" on:input={delayedSearch}/>
         </div>
 
         <div class="flex-vertical search5">
             <label for="formatSearch">Format:</label>
             <select id="formatSearch"
-                    bind:value={searchVariables.format[0]}>
+                    bind:value={format} on:input={delayedSearch}>
                 <option value="" selected>Any</option>
 
                 {#each formats as format}
@@ -226,7 +225,7 @@
         <div class="flex-vertical search6">
             <label for="statusSearch">Status:</label>
             <select id="statusSearch"
-                    bind:value={searchVariables.status[0]}>
+                    bind:value={status} on:input={delayedSearch}>
                 <option value="" selected>Any</option>
 
                 {#each statuses as status}
@@ -241,32 +240,28 @@
     <!-- #region Search results-->
 
     
-    <!-- old
+    <!-- debug 
     <div>
-        <p>Title: {searchVariables.title}</p>
-        <p>Genre: {searchVariables.genres}</p>
-        <p>Season: {searchVariables.season}</p>
-        <p>Year: {searchVariables.year}</p>
-        <p>Format: {searchVariables.format}</p>
-        <p>Status: {searchVariables.status}</p>
+        <p>Title: {title}</p>
+        <p>Genre: {genre}</p>
+        <p>Season: {season}</p>
+        <p>Year: {year}</p>
+        <p>Format: {format}</p>
+        <p>Status: {status}</p>
 
-        <pre style="color: white;">{JSON.stringify(searchVariables, (key, value) => value == false || value == null ? undefined : value, 2)}</pre>
+        <pre style="color: white;">{JSON.stringify(searchObject, (key, value) => value == false || value == null ? undefined : value, 2)}</pre>
     </div>
     -->
 
-    {#if searchResult}
-        {#await searchResult}
-            <p>Searching...</p>
-        {:then data}
-            {#if data.data}
-                <CardGrid animes={data.data.Page.media}/>
-            {:else}
-                <p>An error has occurred...</p>
-            {/if}
-        {/await}
-    {:else}
-        <p>No search has been made.</p>
-    {/if}
+    {#await searchResult}
+        <p>Searching...</p>
+    {:then data}
+        {#if data.data}
+            <CardGrid animes={data.data.Page.media}/>
+        {:else}
+            <p>An error has occurred...</p>
+        {/if}
+    {/await}
 
     <!-- #endregion -->
 </div>
